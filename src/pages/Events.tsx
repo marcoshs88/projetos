@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EventModal } from '@/components/events/EventModal';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { Event, ExtractedData } from '@/types';
+import { Event, ExtractedData, Monitor, Location as LocationType } from '@/types';
 import { showSuccess } from '@/utils/toast';
 import { 
   Plus, 
@@ -23,6 +23,8 @@ import {
 
 const Events = () => {
   const [events, setEvents] = useLocalStorage<Event[]>('events', []);
+  const [monitors, setMonitors] = useLocalStorage<Monitor[]>('monitors', []);
+  const [locations, setLocations] = useLocalStorage<LocationType[]>('locations', []);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | undefined>();
   const [searchTerm, setSearchTerm] = useState('');
@@ -38,7 +40,7 @@ const Events = () => {
         ...prefillData,
         id: '',
         created_at: '',
-        horario: '18:00', // Horário padrão
+        horario: '18:00',
         monitor: '',
         observacoes: '',
         valor_pendente: prefillData.valor_total - prefillData.valor_pago,
@@ -75,6 +77,7 @@ const Events = () => {
   };
 
   const handleSaveEvent = (eventData: Omit<Event, 'id' | 'created_at'>) => {
+    // Salva ou atualiza o evento
     if (editingEvent && editingEvent.id) {
       setEvents(prev => prev.map(event => 
         event.id === editingEvent.id 
@@ -90,6 +93,32 @@ const Events = () => {
       };
       setEvents(prev => [...prev, newEvent]);
       showSuccess('Evento criado com sucesso!');
+    }
+
+    // Cria monitor se não existir
+    const monitorExists = monitors.some(m => m.nome.toLowerCase() === eventData.monitor.toLowerCase());
+    if (!monitorExists && eventData.monitor.trim() !== '') {
+      const newMonitor: Monitor = {
+        id: crypto.randomUUID(),
+        nome: eventData.monitor,
+        email: '',
+        telefone: '',
+        status: 'ativo'
+      };
+      setMonitors(prev => [...prev, newMonitor]);
+    }
+
+    // Cria local se não existir
+    const locationExists = locations.some(l => l.nome.toLowerCase() === eventData.local.toLowerCase());
+    if (!locationExists && eventData.local.trim() !== '') {
+      const newLocation: LocationType = {
+        id: crypto.randomUUID(),
+        nome: eventData.local,
+        endereco: '',
+        contato: '',
+        capacidade: 0
+      };
+      setLocations(prev => [...prev, newLocation]);
     }
   };
 

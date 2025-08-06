@@ -8,10 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Event, Monitor, Location } from '@/types';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { Event } from '@/types';
 import { Save, X } from 'lucide-react';
-import { Combobox } from '@/components/ui/combobox';
 
 const eventSchema = z.object({
   cliente: z.string().min(2, 'Nome do cliente deve ter pelo menos 2 caracteres'),
@@ -35,9 +33,6 @@ interface EventFormProps {
 }
 
 export const EventForm = ({ event, onSave, onCancel }: EventFormProps) => {
-  const [monitors] = useLocalStorage<Monitor[]>('monitors', []);
-  const [locations] = useLocalStorage<Location[]>('locations', []);
-
   const {
     register,
     handleSubmit,
@@ -81,9 +76,6 @@ export const EventForm = ({ event, onSave, onCancel }: EventFormProps) => {
       currency: 'BRL'
     }).format(value);
   };
-
-  const locationOptions = locations.map(loc => ({ value: loc.nome, label: loc.nome }));
-  const monitorOptions = monitors.filter(m => m.status === 'ativo').map(mon => ({ value: mon.nome, label: mon.nome }));
 
   return (
     <Card className="w-full max-w-3xl mx-auto">
@@ -137,38 +129,12 @@ export const EventForm = ({ event, onSave, onCancel }: EventFormProps) => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="local">Local do Evento *</Label>
-                  <Controller
-                    name="local"
-                    control={control}
-                    render={({ field }) => (
-                      <Combobox
-                        options={locationOptions}
-                        value={field.value}
-                        onChange={field.onChange}
-                        placeholder="Selecione ou digite um local..."
-                        searchPlaceholder="Buscar local..."
-                        emptyPlaceholder="Nenhum local encontrado."
-                      />
-                    )}
-                  />
+                  <Input id="local" {...register('local')} />
                   {errors.local && <p className="text-sm text-red-600">{errors.local.message}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="monitor">Monitor Responsável *</Label>
-                   <Controller
-                    name="monitor"
-                    control={control}
-                    render={({ field }) => (
-                      <Combobox
-                        options={monitorOptions}
-                        value={field.value}
-                        onChange={field.onChange}
-                        placeholder="Selecione ou digite um monitor..."
-                        searchPlaceholder="Buscar monitor..."
-                        emptyPlaceholder="Nenhum monitor encontrado."
-                      />
-                    )}
-                  />
+                  <Input id="monitor" {...register('monitor')} />
                   {errors.monitor && <p className="text-sm text-red-600">{errors.monitor.message}</p>}
                 </div>
               </div>

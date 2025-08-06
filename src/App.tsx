@@ -8,9 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Events from "./pages/Events";
 import Upload from "./pages/Upload";
 import Finance from "./pages/Finance";
-import Monitors from "./pages/Monitors";
-import Locations from "./pages/Locations";
-import CalendarPage from "./pages/CalendarPage"; // Importando a nova página
+import CalendarPage from "./pages/CalendarPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,9 +25,7 @@ const App = () => (
             <Route path="/eventos" element={<Events />} />
             <Route path="/upload" element={<Upload />} />
             <Route path="/financeiro" element={<Finance />} />
-            <Route path="/monitores" element={<Monitors />} />
-            <Route path="/locais" element={<Locations />} />
-            <Route path="/calendario" element={<CalendarPage />} /> {/* Nova rota */}
+            <Route path="/calendario" element={<CalendarPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>

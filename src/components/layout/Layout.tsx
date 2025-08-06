@@ -3,11 +3,9 @@ import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { 
   LayoutDashboard, 
-  Calendar as CalendarDays, // Renomeado para evitar conflito
+  Calendar as CalendarDays,
   Upload, 
   DollarSign,
-  Users,
-  MapPin,
   Menu,
   X
 } from 'lucide-react';
@@ -23,8 +21,6 @@ const navigation = [
   { name: 'Calendário', href: '/calendario', icon: CalendarDays },
   { name: 'Eventos', href: '/eventos', icon: CalendarDays },
   { name: 'Financeiro', href: '/financeiro', icon: DollarSign },
-  { name: 'Monitores', href: '/monitores', icon: Users },
-  { name: 'Locais', href: '/locais', icon: MapPin },
   { name: 'Upload', href: '/upload', icon: Upload },
 ];
 
