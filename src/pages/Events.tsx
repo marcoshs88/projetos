@@ -5,10 +5,14 @@ import { Input } from '@/components/ui/input';
 import { Plus, Search, Edit, Trash2 } from 'lucide-react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { Event } from '@/types';
+import { EventForm } from '@/components/events/EventForm';
+import { showSuccess, showError } from '@/utils/toast';
 
 const Events = () => {
   const [events, setEvents] = useLocalStorage<Event[]>('events', []);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -27,9 +31,43 @@ const Events = () => {
     event.servico.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleCreateEvent = () => {
+    setEditingEvent(null);
+    setIsFormOpen(true);
+  };
+
+  const handleEditEvent = (event: Event) => {
+    setEditingEvent(event);
+    setIsFormOpen(true);
+  };
+
+  const handleSaveEvent = (eventData: Omit<Event, 'id' | 'created_at'>) => {
+    if (editingEvent) {
+      // Update existing event
+      const updatedEvent = {
+        ...editingEvent,
+        ...eventData
+      };
+      setEvents(events.map(event => 
+        event.id === editingEvent.id ? updatedEvent : event
+      ));
+      showSuccess('Evento atualizado com sucesso!');
+    } else {
+      // Create new event
+      const newEvent: Event = {
+        ...eventData,
+        id: crypto.randomUUID(),
+        created_at: new Date().toISOString()
+      };
+      setEvents([...events, newEvent]);
+      showSuccess('Evento criado com sucesso!');
+    }
+  };
+
   const deleteEvent = (id: string) => {
     if (confirm('Tem certeza que deseja excluir este evento?')) {
       setEvents(events.filter(event => event.id !== id));
+      showSuccess('Evento excluído com sucesso!');
     }
   };
 
@@ -40,7 +78,7 @@ const Events = () => {
           <h1 className="text-3xl font-bold text-gray-900">Eventos</h1>
           <p className="text-gray-600">Gerencie todos os seus eventos</p>
         </div>
-        <Button>
+        <Button onClick={handleCreateEvent}>
           <Plus className="h-4 w-4 mr-2" />
           Novo Evento
         </Button>
@@ -67,6 +105,16 @@ const Events = () => {
                 <p className="text-gray-500">
                   {searchTerm ? 'Nenhum evento encontrado' : 'Nenhum evento cadastrado'}
                 </p>
+                {!searchTerm && (
+                  <Button 
+                    variant="outline" 
+                    className="mt-4"
+                    onClick={handleCreateEvent}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Criar Primeiro Evento
+                  </Button>
+                )}
               </div>
             ) : (
               filteredEvents.map((event) => (
@@ -88,7 +136,7 @@ const Events = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-gray-600">
                       <div>Data: {formatDate(event.data)}</div>
                       <div>Local: {event.local}</div>
-                      <div>Serviço: {event.servico}</div>
+                      <div>Serviço: {event.servico.substring(0, 50)}...</div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
@@ -103,7 +151,11 @@ const Events = () => {
                       )}
                     </div>
                     <div className="flex space-x-2">
-                      <Button variant="outline" size="icon">
+                      <Button 
+                        variant="outline" 
+                        size="icon"
+                        onClick={() => handleEditEvent(event)}
+                      >
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button 
@@ -121,6 +173,13 @@ const Events = () => {
           </div>
         </CardContent>
       </Card>
+
+      <EventForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSave={handleSaveEvent}
+        event={editingEvent}
+      />
     </div>
   );
 };

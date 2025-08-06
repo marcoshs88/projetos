@@ -7,6 +7,9 @@ import { Layout } from "@/components/layout/Layout";
 import Dashboard from "./pages/Dashboard";
 import Events from "./pages/Events";
 import Upload from "./pages/Upload";
+import Financial from "./pages/Financial";
+import Monitors from "./pages/Monitors";
+import Locations from "./pages/Locations";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,7 +25,9 @@ const App = () => (
             <Route path="/" element={<Dashboard />} />
             <Route path="/eventos" element={<Events />} />
             <Route path="/upload" element={<Upload />} />
-            {/* Rotas adicionais serão adicionadas aqui */}
+            <Route path="/financeiro" element={<Financial />} />
+            <Route path="/monitores" element={<Monitors />} />
+            <Route path="/locais" element={<Locations />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>
