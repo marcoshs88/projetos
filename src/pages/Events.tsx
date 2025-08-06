@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EventModal } from '@/components/events/EventModal';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { Event } from '@/types';
+import { Event, ExtractedData } from '@/types';
 import { showSuccess, showError } from '@/utils/toast';
 import { 
   Plus, 
@@ -25,6 +26,25 @@ const Events = () => {
   const [editingEvent, setEditingEvent] = useState<Event | undefined>();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (location.state?.prefillData) {
+      const prefillData = location.state.prefillData as ExtractedData;
+      // Tratar como um novo evento, mas com dados iniciais
+      setEditingEvent({
+        ...prefillData,
+        id: '', // ID vazio indica que é um novo evento
+        created_at: '',
+        valor_pendente: prefillData.valor_total - prefillData.valor_pago,
+      });
+      setIsModalOpen(true);
+      // Limpar o estado da localização para não reabrir o modal
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location, navigate]);
 
   // Filtrar eventos
   const filteredEvents = events.filter(event => {
@@ -52,7 +72,7 @@ const Events = () => {
   };
 
   const handleSaveEvent = (eventData: Omit<Event, 'id' | 'created_at'>) => {
-    if (editingEvent) {
+    if (editingEvent && editingEvent.id) {
       // Editar evento existente
       setEvents(prev => prev.map(event => 
         event.id === editingEvent.id 
@@ -61,7 +81,7 @@ const Events = () => {
       ));
       showSuccess('Evento atualizado com sucesso!');
     } else {
-      // Criar novo evento
+      // Criar novo evento (seja do zero ou pré-preenchido)
       const newEvent: Event = {
         ...eventData,
         id: crypto.randomUUID(),
@@ -89,7 +109,9 @@ const Events = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR');
+    // Adicionado para evitar erro com datas vazias
+    if (!dateString) return 'Data não definida';
+    return new Date(dateString).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
   };
 
   return (
