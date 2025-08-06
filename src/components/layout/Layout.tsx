@@ -6,6 +6,8 @@ import {
   Calendar, 
   Upload, 
   DollarSign,
+  Users,
+  MapPin,
   Menu,
   X
 } from 'lucide-react';
@@ -19,8 +21,10 @@ interface LayoutProps {
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Eventos', href: '/eventos', icon: Calendar },
-  { name: 'Upload', href: '/upload', icon: Upload },
   { name: 'Financeiro', href: '/financeiro', icon: DollarSign },
+  { name: 'Monitores', href: '/monitores', icon: Users },
+  { name: 'Locais', href: '/locais', icon: MapPin },
+  { name: 'Upload', href: '/upload', icon: Upload },
 ];
 
 export const Layout = ({ children }: LayoutProps) => {

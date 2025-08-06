@@ -20,3 +20,19 @@ export interface ExtractedData {
   servico: string;
   status: 'confirmado' | 'pendente' | 'cancelado';
 }
+
+export interface Monitor {
+  id: string;
+  nome: string;
+  telefone: string;
+  email: string;
+  status: 'ativo' | 'inativo';
+}
+
+export interface Location {
+  id: string;
+  nome: string;
+  endereco: string;
+  contato: string;
+  capacidade: number;
+}
