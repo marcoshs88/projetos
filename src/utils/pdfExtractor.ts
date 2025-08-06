@@ -48,25 +48,70 @@ const sampleContracts = [
     valor_pago: 1000.00,
     servico: "Aniversário de 50 anos, churrasco para 60 pessoas, música ao vivo, decoração rústica",
     status: "pendente" as const
+  },
+  {
+    cliente: "Carlos Eduardo Mendes",
+    data: "2024-03-05",
+    local: "Espaço Eventos Jardim",
+    valor_total: 6800.00,
+    valor_pago: 3000.00,
+    servico: "Formatura de medicina, jantar para 150 pessoas, cerimônia de colação, fotografia profissional",
+    status: "confirmado" as const
   }
 ];
 
+// Função para gerar hash simples baseado no nome e tamanho do arquivo
+const generateFileHash = (file: File): number => {
+  let hash = 0;
+  const str = file.name + file.size.toString();
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
+};
+
 export const extractDataFromPDF = async (file: File): Promise<ExtractedData> => {
-  // Simula o tempo de processamento
+  // Simula o tempo de processamento de OCR/IA
   await new Promise(resolve => setTimeout(resolve, 2000));
   
-  // Retorna dados simulados aleatórios
-  const randomContract = sampleContracts[Math.floor(Math.random() * sampleContracts.length)];
+  // Gera índice baseado no arquivo para consistência
+  const fileHash = generateFileHash(file);
+  const contractIndex = fileHash % sampleContracts.length;
+  const selectedContract = sampleContracts[contractIndex];
   
-  console.log(`Processando arquivo: ${file.name}`);
-  console.log('Dados extraídos:', randomContract);
+  // Adiciona pequenas variações baseadas no arquivo para parecer mais real
+  const variations = {
+    cliente: selectedContract.cliente,
+    data: selectedContract.data,
+    local: selectedContract.local,
+    valor_total: selectedContract.valor_total + (fileHash % 100), // Pequena variação no valor
+    valor_pago: selectedContract.valor_pago,
+    servico: selectedContract.servico,
+    status: selectedContract.status
+  };
   
-  return randomContract;
+  console.log(`Processando arquivo: ${file.name} (${(file.size / 1024).toFixed(1)}KB)`);
+  console.log('Hash do arquivo:', fileHash);
+  console.log('Dados extraídos:', variations);
+  
+  return variations;
 };
 
 // Função para validar se o arquivo é um PDF válido
 export const validatePDFFile = (file: File): boolean => {
-  return file.type === 'application/pdf' && file.size > 0;
+  const isValidType = file.type === 'application/pdf';
+  const isValidSize = file.size > 0 && file.size < 10 * 1024 * 1024; // Máximo 10MB
+  
+  if (!isValidType) {
+    console.error('Tipo de arquivo inválido:', file.type);
+  }
+  if (!isValidSize) {
+    console.error('Tamanho de arquivo inválido:', file.size);
+  }
+  
+  return isValidType && isValidSize;
 };
 
 // Função para formatar dados extraídos
@@ -79,4 +124,21 @@ export const formatExtractedData = (data: ExtractedData): ExtractedData => {
     valor_total: Number(data.valor_total.toFixed(2)),
     valor_pago: Number(data.valor_pago.toFixed(2))
   };
+};
+
+// Função para simular diferentes tipos de erro que podem ocorrer
+export const simulateExtractionErrors = (file: File): string | null => {
+  const fileHash = generateFileHash(file);
+  
+  // 5% de chance de erro simulado
+  if (fileHash % 20 === 0) {
+    return "PDF com qualidade de imagem muito baixa para extração";
+  }
+  
+  // 3% de chance de erro de formato
+  if (fileHash % 33 === 0) {
+    return "Formato de contrato não reconhecido";
+  }
+  
+  return null; // Sem erro
 };

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { PDFUploader } from '@/components/upload/PDFUploader';
 import { ExtractedDataForm } from '@/components/upload/ExtractedDataForm';
-import { extractDataFromPDF, ExtractedData, validatePDFFile } from '@/utils/pdfExtractor';
+import { extractDataFromPDF, ExtractedData, validatePDFFile, simulateExtractionErrors } from '@/utils/pdfExtractor';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { Event } from '@/types';
 import { showSuccess, showError } from '@/utils/toast';
@@ -15,18 +15,24 @@ const Upload = () => {
 
   const handleFileUpload = async (file: File) => {
     if (!validatePDFFile(file)) {
-      showError('Arquivo PDF inválido');
+      showError('Arquivo PDF inválido ou muito grande (máximo 10MB)');
       return;
     }
 
     setIsProcessing(true);
     try {
+      // Simular possíveis erros de extração
+      const extractionError = simulateExtractionErrors(file);
+      if (extractionError) {
+        throw new Error(extractionError);
+      }
+
       const data = await extractDataFromPDF(file);
       setExtractedData(data);
-      showSuccess('Dados extraídos com sucesso!');
+      showSuccess('Dados extraídos com sucesso do contrato!');
     } catch (error) {
       console.error('Erro ao processar PDF:', error);
-      showError('Erro ao processar o arquivo PDF');
+      showError(error instanceof Error ? error.message : 'Erro ao processar o arquivo PDF');
     } finally {
       setIsProcessing(false);
     }
@@ -60,6 +66,12 @@ const Upload = () => {
         <p className="text-gray-600">
           Faça upload do contrato em PDF para extrair automaticamente as informações do evento
         </p>
+        <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-800">
+            <strong>Demonstração:</strong> Este sistema simula a extração de dados por IA. 
+            O mesmo arquivo sempre retornará os mesmos dados extraídos.
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -76,7 +88,7 @@ const Upload = () => {
                 <div>
                   <h3 className="font-medium text-blue-900">Processando PDF...</h3>
                   <p className="text-sm text-blue-700">
-                    Extraindo informações do contrato usando IA
+                    Analisando documento e extraindo informações usando IA
                   </p>
                 </div>
               </div>
@@ -106,20 +118,27 @@ const Upload = () => {
                 <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-semibold">
                   1
                 </div>
-                <p>Faça upload do contrato em formato PDF</p>
+                <p>Faça upload do contrato em formato PDF (máximo 10MB)</p>
               </div>
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-semibold">
                   2
                 </div>
-                <p>Nossa IA extrai automaticamente as informações</p>
+                <p>Nossa IA analisa o documento e extrai as informações automaticamente</p>
               </div>
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-semibold">
                   3
                 </div>
-                <p>Revise e confirme os dados antes de salvar</p>
+                <p>Revise e confirme os dados antes de salvar o evento</p>
               </div>
+            </div>
+            
+            <div className="mt-6 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-xs text-yellow-800">
+                <strong>Nota:</strong> Em produção, este sistema seria integrado com APIs de OCR 
+                como Google Vision, AWS Textract ou Azure Form Recognizer para extração real de dados.
+              </p>
             </div>
           </div>
         </div>
