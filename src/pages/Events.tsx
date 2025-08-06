@@ -44,6 +44,7 @@ const Events = () => {
         monitor: '',
         observacoes: '',
         valor_pendente: prefillData.valor_total - prefillData.valor_pago,
+        payments: [], // Inicializa payments
       });
       setIsModalOpen(true);
       navigate(location.pathname, { replace: true, state: {} });
@@ -89,7 +90,8 @@ const Events = () => {
       const newEvent: Event = {
         ...eventData,
         id: crypto.randomUUID(),
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        payments: eventData.payments || [], // Garante que payments exista
       };
       setEvents(prev => [...prev, newEvent]);
       showSuccess('Evento criado com sucesso!');
