@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar } from '@/components/ui/calendar';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { Event } from '@/types';
-import { DayContent, DayContentProps } from 'react-day-picker';
+import { DayContentProps } from 'react-day-picker';
 import { Badge } from '@/components/ui/badge';
 import { Calendar as CalendarIcon } from 'lucide-react';
 
@@ -27,15 +27,15 @@ const CalendarPage = () => {
     const dayEvents = eventsByDate[dateStr] || [];
 
     return (
-      <div className="relative h-full w-full flex flex-col p-1">
-        <DayContent {...props} />
+      <div className="relative h-full w-full flex flex-col items-start p-2">
+        <span className="text-sm font-medium">{props.date.getDate()}</span>
         {dayEvents.length > 0 && (
-          <div className="mt-1 space-y-1 overflow-y-auto">
+          <div className="mt-1 w-full space-y-1 overflow-y-auto">
             {dayEvents.map(event => (
               <Badge 
                 key={event.id} 
                 variant="secondary" 
-                className="w-full text-left block whitespace-nowrap overflow-hidden text-ellipsis"
+                className="w-full text-left block whitespace-nowrap overflow-hidden text-ellipsis text-xs p-1"
               >
                 {event.horario} - {event.cliente}
               </Badge>
@@ -81,7 +81,7 @@ const CalendarPage = () => {
               head_row: "flex",
               head_cell: "text-muted-foreground rounded-md w-full font-normal text-[0.8rem]",
               row: "flex w-full mt-2",
-              cell: "h-24 w-full text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+              cell: "h-32 w-full text-left text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
               day: "h-full w-full p-0 font-normal",
               day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
               day_today: "bg-accent text-accent-foreground",
