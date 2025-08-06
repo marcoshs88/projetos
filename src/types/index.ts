@@ -2,8 +2,11 @@ export interface Event {
   id: string;
   cliente: string;
   data: string;
-  local: string;
+  horario: string; // Novo campo
+  local: string; // Será preenchido pela lista de locais
+  monitor: string; // Será preenchido pela lista de monitores
   servico: string;
+  observacoes: string; // Novo campo
   valor_total: number;
   valor_pago: number;
   valor_pendente: number;
