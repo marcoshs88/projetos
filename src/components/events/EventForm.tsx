@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Event, Monitor, Location } from '@/types';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { Save, X } from 'lucide-react';
+import { Combobox } from '@/components/ui/combobox';
 
 const eventSchema = z.object({
   cliente: z.string().min(2, 'Nome do cliente deve ter pelo menos 2 caracteres'),
@@ -40,7 +41,7 @@ export const EventForm = ({ event, onSave, onCancel }: EventFormProps) => {
   const {
     register,
     handleSubmit,
-    setValue,
+    control,
     watch,
     formState: { errors, isSubmitting }
   } = useForm<EventFormData>({
@@ -81,6 +82,9 @@ export const EventForm = ({ event, onSave, onCancel }: EventFormProps) => {
     }).format(value);
   };
 
+  const locationOptions = locations.map(loc => ({ value: loc.nome, label: loc.nome }));
+  const monitorOptions = monitors.filter(m => m.status === 'ativo').map(mon => ({ value: mon.nome, label: mon.nome }));
+
   return (
     <Card className="w-full max-w-3xl mx-auto">
       <CardHeader>
@@ -106,14 +110,20 @@ export const EventForm = ({ event, onSave, onCancel }: EventFormProps) => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="status">Status *</Label>
-                  <Select value={watchedValues.status} onValueChange={(value) => setValue('status', value)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pendente">Pendente</SelectItem>
-                      <SelectItem value="confirmado">Confirmado</SelectItem>
-                      <SelectItem value="cancelado">Cancelado</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Controller
+                    name="status"
+                    control={control}
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pendente">Pendente</SelectItem>
+                          <SelectItem value="confirmado">Confirmado</SelectItem>
+                          <SelectItem value="cancelado">Cancelado</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="data">Data do Evento *</Label>
@@ -127,22 +137,38 @@ export const EventForm = ({ event, onSave, onCancel }: EventFormProps) => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="local">Local do Evento *</Label>
-                  <Select value={watchedValues.local} onValueChange={(value) => setValue('local', value)}>
-                    <SelectTrigger><SelectValue placeholder="Selecione um local" /></SelectTrigger>
-                    <SelectContent>
-                      {locations.map(loc => <SelectItem key={loc.id} value={loc.nome}>{loc.nome}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
+                  <Controller
+                    name="local"
+                    control={control}
+                    render={({ field }) => (
+                      <Combobox
+                        options={locationOptions}
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Selecione ou digite um local..."
+                        searchPlaceholder="Buscar local..."
+                        emptyPlaceholder="Nenhum local encontrado."
+                      />
+                    )}
+                  />
                   {errors.local && <p className="text-sm text-red-600">{errors.local.message}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="monitor">Monitor Responsável *</Label>
-                  <Select value={watchedValues.monitor} onValueChange={(value) => setValue('monitor', value)}>
-                    <SelectTrigger><SelectValue placeholder="Selecione um monitor" /></SelectTrigger>
-                    <SelectContent>
-                      {monitors.filter(m => m.status === 'ativo').map(mon => <SelectItem key={mon.id} value={mon.nome}>{mon.nome}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
+                   <Controller
+                    name="monitor"
+                    control={control}
+                    render={({ field }) => (
+                      <Combobox
+                        options={monitorOptions}
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Selecione ou digite um monitor..."
+                        searchPlaceholder="Buscar monitor..."
+                        emptyPlaceholder="Nenhum monitor encontrado."
+                      />
+                    )}
+                  />
                   {errors.monitor && <p className="text-sm text-red-600">{errors.monitor.message}</p>}
                 </div>
               </div>
