@@ -8,7 +8,8 @@ import {
   DollarSign,
   Menu,
   X,
-  Settings
+  Settings,
+  FileText
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
@@ -20,6 +21,7 @@ interface LayoutProps {
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Eventos', href: '/eventos', icon: CalendarDays },
+  { name: 'Redigir Contrato', href: '/contrato', icon: FileText },
   { name: 'Financeiro', href: '/financeiro', icon: DollarSign },
   { name: 'Upload', href: '/upload', icon: Upload },
   { name: 'Configurações', href: '/configuracoes', icon: Settings },

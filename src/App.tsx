@@ -9,6 +9,7 @@ import Events from "./pages/Events";
 import Upload from "./pages/Upload";
 import Finance from "./pages/Finance";
 import Settings from "./pages/Settings";
+import ContractPage from "./pages/Contract";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/eventos" element={<Events />} />
             <Route path="/upload" element={<Upload />} />
             <Route path="/financeiro" element={<Finance />} />
+            <Route path="/contrato" element={<ContractPage />} />
             <Route path="/configuracoes" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
