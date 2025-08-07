@@ -9,19 +9,35 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ContractPDF } from '@/components/contracts/ContractPDF';
 import { showSuccess } from '@/utils/toast';
 import { FileText, Download, PlusCircle } from 'lucide-react';
 
 const contractSchema = z.object({
+  // Contratante
   cliente: z.string().min(2, 'Nome do cliente é obrigatório'),
   documento: z.string().optional(),
-  endereco: z.string().optional(),
+  endereco_cliente: z.string().optional(),
+  telefone_cliente: z.string().optional(),
+  
+  // Evento
   data: z.string().min(1, 'Data é obrigatória'),
-  horario: z.string().min(1, 'Horário é obrigatório'),
+  horario_inicio: z.string().min(1, 'Horário de início é obrigatório'),
+  horario_termino: z.string().min(1, 'Horário de término é obrigatório'),
   local: z.string().min(1, 'Local é obrigatório'),
+  nome_aniversariante: z.string().optional(),
+  idade_aniversariante: z.string().optional(),
+  numero_criancas: z.string().optional(),
+  
+  // Serviço
   servico: z.string().min(5, 'Descrição do serviço é obrigatória'),
+  monitor: z.string().min(1, 'Monitor é obrigatório'),
+  uso_imagem_autorizado: z.boolean().default(false),
+
+  // Financeiro
   valor_total: z.string().min(1, 'Valor total é obrigatório'),
+  pagamento_sinal: z.string().optional(),
 });
 
 type ContractFormData = z.infer<typeof contractSchema>;
@@ -33,6 +49,7 @@ const ContractPage = () => {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<ContractFormData>({
     resolver: zodResolver(contractSchema),
@@ -46,15 +63,18 @@ const ContractPage = () => {
   const handleCreateEvent = () => {
     if (!submittedData) return;
 
+    const valorTotal = parseFloat(submittedData.valor_total);
+    const valorSinal = submittedData.pagamento_sinal ? parseFloat(submittedData.pagamento_sinal) : 0;
+
     const eventData = {
-      cliente: submittedData.cliente,
-      data: submittedData.data,
-      horario: submittedData.horario,
-      local: submittedData.local,
-      servico: submittedData.servico,
-      valor_total: parseFloat(submittedData.valor_total),
-      valor_pago: 0,
+      ...submittedData,
+      valor_total: valorTotal,
+      valor_pago: valorSinal,
       status: 'pendente',
+      horario: `${submittedData.horario_inicio} - ${submittedData.horario_termino}`,
+      pagamento_sinal: valorSinal,
+      pagamento_restante: valorTotal - valorSinal,
+      observacoes: '',
     };
 
     navigate('/eventos', { state: { prefillData: eventData } });
@@ -72,55 +92,108 @@ const ContractPage = () => {
       <Card>
         <CardHeader>
           <CardTitle>Dados do Contrato</CardTitle>
-          <CardDescription>
-            As informações preenchidas aqui serão usadas para gerar o PDF e o evento.
-          </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            {/* Contratante */}
+            <fieldset className="space-y-4 border-t pt-6">
+              <legend className="text-lg font-medium">Dados do Contratante</legend>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="cliente">Nome Completo *</Label>
+                  <Input id="cliente" {...register('cliente')} />
+                  {errors.cliente && <p className="text-sm text-red-600">{errors.cliente.message}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="documento">CPF/CNPJ</Label>
+                  <Input id="documento" {...register('documento')} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="endereco_cliente">Endereço</Label>
+                  <Input id="endereco_cliente" {...register('endereco_cliente')} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="telefone_cliente">Telefone</Label>
+                  <Input id="telefone_cliente" {...register('telefone_cliente')} />
+                </div>
+              </div>
+            </fieldset>
+
+            {/* Evento */}
+            <fieldset className="space-y-4 border-t pt-6">
+              <legend className="text-lg font-medium">Dados do Evento</legend>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="data">Data do Evento *</Label>
+                  <Input id="data" type="date" {...register('data')} />
+                  {errors.data && <p className="text-sm text-red-600">{errors.data.message}</p>}
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="horario_inicio">Início *</Label>
+                    <Input id="horario_inicio" type="time" {...register('horario_inicio')} />
+                    {errors.horario_inicio && <p className="text-sm text-red-600">{errors.horario_inicio.message}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="horario_termino">Término *</Label>
+                    <Input id="horario_termino" type="time" {...register('horario_termino')} />
+                    {errors.horario_termino && <p className="text-sm text-red-600">{errors.horario_termino.message}</p>}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="local">Local do Evento *</Label>
+                  <Input id="local" {...register('local')} />
+                  {errors.local && <p className="text-sm text-red-600">{errors.local.message}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="nome_aniversariante">Nome do Aniversariante</Label>
+                  <Input id="nome_aniversariante" {...register('nome_aniversariante')} />
+                </div>
+                 <div className="space-y-2">
+                  <Label htmlFor="idade_aniversariante">Idade do Aniversariante</Label>
+                  <Input id="idade_aniversariante" {...register('idade_aniversariante')} />
+                </div>
+                 <div className="space-y-2">
+                  <Label htmlFor="numero_criancas">Nº aproximado de crianças</Label>
+                  <Input id="numero_criancas" {...register('numero_criancas')} />
+                </div>
+              </div>
+            </fieldset>
+
+            {/* Serviço e Financeiro */}
+            <fieldset className="space-y-4 border-t pt-6">
+              <legend className="text-lg font-medium">Serviços e Pagamento</legend>
               <div className="space-y-2">
-                <Label htmlFor="cliente">Nome do Cliente *</Label>
-                <Input id="cliente" {...register('cliente')} />
-                {errors.cliente && <p className="text-sm text-red-600">{errors.cliente.message}</p>}
+                <Label htmlFor="servico">Serviços Inclusos *</Label>
+                <Textarea id="servico" {...register('servico')} placeholder="Ex: Recreação com 2 monitores, oficina de slime, caça ao tesouro..." />
+                {errors.servico && <p className="text-sm text-red-600">{errors.servico.message}</p>}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="documento">CPF/CNPJ</Label>
-                <Input id="documento" {...register('documento')} />
+                <Label htmlFor="monitor">Monitor(es) Responsável(is) *</Label>
+                <Input id="monitor" {...register('monitor')} />
+                {errors.monitor && <p className="text-sm text-red-600">{errors.monitor.message}</p>}
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="endereco">Endereço do Cliente</Label>
-              <Input id="endereco" {...register('endereco')} />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="data">Data do Evento *</Label>
-                <Input id="data" type="date" {...register('data')} />
-                {errors.data && <p className="text-sm text-red-600">{errors.data.message}</p>}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="valor_total">Valor Total (R$) *</Label>
+                  <Input id="valor_total" type="number" step="0.01" {...register('valor_total')} />
+                  {errors.valor_total && <p className="text-sm text-red-600">{errors.valor_total.message}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="pagamento_sinal">Sinal (R$)</Label>
+                  <Input id="pagamento_sinal" type="number" step="0.01" {...register('pagamento_sinal')} />
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="horario">Horário *</Label>
-                <Input id="horario" type="time" {...register('horario')} />
-                {errors.horario && <p className="text-sm text-red-600">{errors.horario.message}</p>}
-              </div>
+            </fieldset>
+            
+            <div className="flex items-center space-x-2 border-t pt-6">
+              <Checkbox id="uso_imagem_autorizado" {...register('uso_imagem_autorizado')} />
+              <Label htmlFor="uso_imagem_autorizado">
+                O cliente autoriza o uso de imagem do evento para divulgação nas redes sociais da contratada.
+              </Label>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="local">Local do Evento *</Label>
-              <Input id="local" {...register('local')} />
-              {errors.local && <p className="text-sm text-red-600">{errors.local.message}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="servico">Serviços Contratados *</Label>
-              <Textarea id="servico" {...register('servico')} />
-              {errors.servico && <p className="text-sm text-red-600">{errors.servico.message}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="valor_total">Valor Total (R$) *</Label>
-              <Input id="valor_total" type="number" step="0.01" {...register('valor_total')} />
-              {errors.valor_total && <p className="text-sm text-red-600">{errors.valor_total.message}</p>}
-            </div>
-            <Button type="submit" disabled={isSubmitting}>
+
+            <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto">
               <FileText className="h-4 w-4 mr-2" />
               {isSubmitting ? 'Validando...' : 'Validar Dados para Gerar Contrato'}
             </Button>
@@ -136,20 +209,21 @@ const ContractPage = () => {
               Os dados foram validados. Agora você pode baixar o PDF ou criar o evento.
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex space-x-4">
+          <CardContent className="flex flex-col md:flex-row gap-4">
             <PDFDownloadLink
               document={<ContractPDF data={submittedData} />}
               fileName={`contrato-${submittedData.cliente.replace(/\s/g, '_')}.pdf`}
+              className="w-full md:w-auto"
             >
               {({ loading }) => (
-                <Button disabled={loading}>
+                <Button disabled={loading} className="w-full">
                   <Download className="h-4 w-4 mr-2" />
                   {loading ? 'Gerando PDF...' : 'Baixar Contrato em PDF'}
                 </Button>
               )}
             </PDFDownloadLink>
 
-            <Button variant="outline" onClick={handleCreateEvent}>
+            <Button variant="outline" onClick={handleCreateEvent} className="w-full md:w-auto">
               <PlusCircle className="h-4 w-4 mr-2" />
               Criar Evento com estes Dados
             </Button>
