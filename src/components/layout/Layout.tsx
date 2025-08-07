@@ -7,7 +7,8 @@ import {
   Upload, 
   DollarSign,
   Menu,
-  X
+  X,
+  Settings
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
@@ -21,6 +22,7 @@ const navigation = [
   { name: 'Eventos', href: '/eventos', icon: CalendarDays },
   { name: 'Financeiro', href: '/financeiro', icon: DollarSign },
   { name: 'Upload', href: '/upload', icon: Upload },
+  { name: 'Configurações', href: '/configuracoes', icon: Settings },
 ];
 
 export const Layout = ({ children }: LayoutProps) => {
