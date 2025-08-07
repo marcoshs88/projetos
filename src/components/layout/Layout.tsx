@@ -18,7 +18,6 @@ interface LayoutProps {
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Calendário', href: '/calendario', icon: CalendarDays },
   { name: 'Eventos', href: '/eventos', icon: CalendarDays },
   { name: 'Financeiro', href: '/financeiro', icon: DollarSign },
   { name: 'Upload', href: '/upload', icon: Upload },
