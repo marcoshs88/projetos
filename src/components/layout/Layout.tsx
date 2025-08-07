@@ -18,7 +18,6 @@ interface LayoutProps {
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Calendário', href: '/calendario', icon: CalendarDays },
   { name: 'Eventos', href: '/eventos', icon: CalendarDays },
   { name: 'Financeiro', href: '/financeiro', icon: DollarSign },
   { name: 'Upload', href: '/upload', icon: Upload },
@@ -129,7 +128,7 @@ export const Layout = ({ children }: LayoutProps) => {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             {children}
           </div>
-        </main>
+        main>
       </div>
     </div>
   );
