@@ -1,110 +1,82 @@
-# React + Vite Template - Lasy AI
+# Expert Advisor para MetaTrader 5
 
-Bem-vindo ao seu app Lasy! Este é um template [React](https://react.dev) + [Vite](https://vite.dev) otimizado para desenvolvimento rápido e deploys sem problemas.
+Este é um Expert Advisor (EA) básico para MetaTrader 5 que implementa uma estratégia de trading baseada no cruzamento de médias móveis.
 
-## 🚀 Melhorias para Deploy na Vercel
+## Características
 
-Este template inclui otimizações específicas para evitar erros comuns de deploy:
+- **Estratégia**: Cruzamento de médias móveis (10 e 20 períodos)
+- **Gerenciamento de Risco**: Stop Loss e Take Profit configuráveis
+- **Controle de Horário**: Trading apenas em horários específicos
+- **Limite de Trades**: Máximo de trades simultâneos
+- **Parâmetros Configuráveis**: Todos os parâmetros podem ser ajustados
 
-### ✅ **Compatibilidade de Dependências**
+## Parâmetros de Configuração
 
-- **React 19** + **TanStack Query 5.75** + todas as dependências atualizadas
-- **react-day-picker v9** compatível com React 19
-- **Configuração `.npmrc`** para resolver conflitos automaticamente
+### Configurações Gerais
+- `InpEnableTrading`: Habilitar/desabilitar o trading
+- `InpMagicNumber`: Número mágico para identificar as ordens do EA
+- `InpComment`: Comentário que aparecerá nas ordens
 
-### ✅ **Performance Otimizada**
+### Configurações de Trading
+- `InpLotSize`: Tamanho do lote para cada trade
+- `InpStopLoss`: Stop Loss em pontos
+- `InpTakeProfit`: Take Profit em pontos
+- `InpSlippage`: Slippage máximo aceitável
 
-- **Vite 6.3** para builds ultra-rápidos
-- **SWC** para compilação otimizada
-- **Tree-shaking** automático para bundles menores
+### Configurações de Tempo
+- `InpStartHour`: Hora de início do trading
+- `InpEndHour`: Hora de fim do trading
+- `InpTradeOnFriday`: Permitir trading na sexta-feira
 
-### ✅ **Componentes Atualizados**
+### Configurações de Risco
+- `InpMaxRisk`: Risco máximo por trade (%)
+- `InpMaxTrades`: Máximo de trades simultâneos
 
-- **Calendar component** compatível com react-day-picker v9
-- **UI components** do Shadcn/UI nas versões mais recentes
-- **Router** React Router DOM 6.28 para navegação
+## Como Instalar
 
----
+1. Copie o arquivo `ExpertAdvisor.mq5` para a pasta `MQL5/Experts/` do seu MetaTrader 5
+2. Compile o EA no MetaEditor
+3. Arraste o EA para o gráfico desejado
+4. Configure os parâmetros conforme sua estratégia
+5. Clique em "OK" para ativar
 
-## 🛠️ Começando
+## Estratégia de Trading
 
-Execute o servidor de desenvolvimento:
+O EA utiliza uma estratégia simples de cruzamento de médias móveis:
 
-```bash
-npm run dev
-# ou
-yarn dev
-# ou
-pnpm dev
-# ou
-bun dev
-```
+- **Sinal de Compra**: Quando a média móvel rápida (10 períodos) cruza acima da média móvel lenta (20 períodos)
+- **Sinal de Venda**: Quando a média móvel rápida cruza abaixo da média móvel lenta
 
-Abra [http://localhost:5173](http://localhost:5173) no seu navegador para ver o resultado.
+## Gerenciamento de Risco
 
-Você pode começar editando os arquivos em `src/`. O Vite atualiza automaticamente com hot reload.
+- Stop Loss e Take Profit são aplicados automaticamente
+- Limite de trades simultâneos para evitar over-trading
+- Controle de horário para evitar trading em momentos de baixa liquidez
+- Verificação de permissões de trading antes de executar ordens
 
----
+## Avisos Importantes
 
-## 📚 Stack Tecnológica
+⚠️ **Este EA é apenas para fins educacionais e de demonstração.**
 
-- **Framework**: React 19 com hooks modernos
-- **Build Tool**: Vite 6.3 com SWC
-- **Routing**: React Router DOM 6.28
-- **Styling**: Tailwind CSS + Shadcn/UI
-- **Icons**: Lucide React
-- **Forms**: React Hook Form + Zod
-- **State Management**: TanStack Query
-- **UI Components**: Radix UI primitives
+- Teste sempre em conta demo antes de usar em conta real
+- Ajuste os parâmetros conforme sua estratégia e tolerância ao risco
+- Monitore o desempenho regularmente
+- O trading envolve riscos significativos
 
----
+## Personalização
 
-## 🔧 Deploy na Vercel
+Você pode modificar o EA para:
 
-### **Configuração Automática**
+- Adicionar mais indicadores técnicos
+- Implementar diferentes estratégias de trading
+- Adicionar filtros de tendência
+- Implementar trailing stop
+- Adicionar notificações por email/SMS
 
-1. Conecte seu repositório GitHub à Vercel
-2. A Vercel detectará automaticamente Vite
-3. O build será executado com `npm run build`
-4. Deploy automático em cada push
+## Suporte
 
-### **Variáveis de Ambiente**
-
-Se você estiver usando APIs externas, configure na Vercel:
-
-```bash
-VITE_API_URL=sua_url_da_api
-VITE_SUPABASE_URL=sua_url_do_supabase
-VITE_SUPABASE_ANON_KEY=sua_chave_anonima
-```
-
-> **Nota**: Prefixe variáveis client-side com `VITE_`
+Para dúvidas ou sugestões, consulte a documentação oficial do MQL5 ou fóruns especializados.
 
 ---
 
-## 📦 Scripts Disponíveis
-
-- `npm run dev` - Inicia servidor de desenvolvimento
-- `npm run build` - Build para produção
-- `npm run build:dev` - Build para desenvolvimento
-- `npm run preview` - Preview do build local
-- `npm run lint` - Executa ESLint
-
----
-
-## 🎯 Deploy Otimizado
-
-### **Vite + Vercel = Performance Máxima**
-
-- ⚡ **Build ultra-rápido** com Vite
-- 🗜️ **Bundles otimizados** com tree-shaking
-- 🔄 **Hot reload** instantâneo em desenvolvimento
-- 📱 **PWA ready** com Vite PWA plugin
-
-### **Zero Configuration**
-
-O template já vem configurado para deploy direto na Vercel sem configurações adicionais!
-
----
-
-_Template otimizado para uso com Lasy AI - desenvolvimento rápido e deploys sem problemas!_
+**Desenvolvido para MetaTrader 5**
